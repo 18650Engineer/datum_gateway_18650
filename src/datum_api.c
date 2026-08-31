@@ -1618,6 +1618,23 @@ void datum_api_dash_stats(T_DATUM_API_DASH_VARS *dashdata) {
 
 }
 
+int datum_api_blockfound(struct MHD_Connection *connection) {
+    struct MHD_Response *response;
+
+    response = MHD_create_response_from_buffer(
+        www_blockfound_html_sz,
+        (void *)www_blockfound_html,
+        MHD_RESPMEM_PERSISTENT
+    );
+
+    MHD_add_response_header(response, "Content-Type", "text/html");
+
+    return datum_api_submit_uncached_response(
+        connection,
+        MHD_HTTP_OK,
+        response
+    );
+}
 int datum_api_homepage(struct MHD_Connection *connection) {
 	struct MHD_Response *response;
 	char output[DATUM_API_HOMEPAGE_MAX_SIZE];
@@ -1822,7 +1839,13 @@ enum MHD_Result datum_api_answer(void *cls, struct MHD_Connection *connection, c
 			}
 			break;
 		}
-		
+		case 'b': {
+    if (!strcmp(url, "/blockfound")) {
+        return datum_api_blockfound(connection);
+    }
+    break;
+}
+
 		case 'c': {
 			if (!strcmp(url, "/clients")) {
 				return datum_api_client_dashboard(connection);

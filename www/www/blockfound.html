@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DATUM Gateway - Block Found</title>
+
+    <link rel="stylesheet" type="text/css" href="./assets/style.css">
+
+    <style>
+        /* =========================================================
+           BLOCK FOUND - STEP 1 UI
+           No Bitcoin RPC or automatic checking yet.
+           ========================================================= */
+
+        .blockfound-page {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            color: white;
+        }
+
+        .blockfound-title {
+            text-align: center;
+            color: #3498db;
+            margin: 10px 0 5px 0;
+        }
+
+        .blockfound-subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .blockfound-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .blockfound-box {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .blockfound-box h2 {
+            margin-top: 0;
+            color: #3498db;
+            text-align: center;
+        }
+
+        .total-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .total-card {
+            background-color: #222;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .total-card .label {
+            color: #999;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .btc-value {
+            color: #f7931a;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .blocks-count {
+            color: #f7931a;
+            font-size: 54px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .search-panel {
+            grid-column: 1 / -1;
+        }
+
+        .form-row {
+            margin-bottom: 18px;
+        }
+
+        .form-row label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 7px;
+        }
+
+        .blockfound-select,
+        .address-input {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #222;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 11px;
+            font-size: 15px;
+        }
+
+        .address-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .address-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .address-label {
+            min-width: 180px;
+            color: #aaa;
+        }
+
+        .datum-address {
+            color: #3498db;
+            word-break: break-all;
+        }
+
+        .search-button {
+            display: block;
+            margin: 25px auto 5px auto;
+            background-color: #444;
+            color: #3498db;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 28px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #012740;
+            color: red;
+        }
+
+        .search-status {
+            text-align: center;
+            color: #00ff41;
+            min-height: 24px;
+            margin-top: 10px;
+        }
+
+        /* Newest block */
+
+        .newest-block {
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            min-height: 310px;
+        }
+
+        .radiation-stage {
+            position: relative;
+            width: 240px;
+            height: 180px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radiation-ring {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border: 2px solid #f7931a;
+            border-radius: 50%;
+            opacity: 0.45;
+            animation: radiationPulse 3s infinite ease-out;
+        }
+
+        .radiation-ring:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .radiation-ring:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        .block-square {
+            position: relative;
+            z-index: 5;
+            width: 110px;
+            height: 110px;
+            border: 2px solid #f7931a;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f7931a;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 0 18px rgba(247, 147, 26, 0.35);
+        }
+
+        @keyframes radiationPulse {
+            0% {
+                transform: scale(0.7);
+                opacity: 0.65;
+            }
+
+            100% {
+                transform: scale(2.4);
+                opacity: 0;
+            }
+        }
+
+        .no-block {
+            color: #777;
+            padding: 30px;
+            text-align: center;
+        }
+
+        /* Matrix history */
+
+        .history-box {
+            height: 350px;
+        }
+
+        .matrix-history {
+            height: 280px;
+            overflow-y: auto;
+            background-color: #050805;
+            border-radius: 5px;
+            padding: 12px;
+            font-family: "Courier New", monospace;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .matrix-decoration {
+            color: #00ff41;
+            opacity: 0.35;
+            font-size: 11px;
+            line-height: 13px;
+            word-break: break-all;
+        }
+
+        .history-entry {
+            border-bottom: 1px solid #123512;
+            padding: 9px 3px;
+            color: #00ff41;
+        }
+
+        .history-block,
+        .history-amount {
+            color: #f7931a;
+            font-weight: bold;
+        }
+
+        .history-meta {
+            color: #00aa2a;
+            font-size: 11px;
+        }
+
+        .settings-note {
+            color: #777;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 850px) {
+            .blockfound-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-panel {
+                grid-column: auto;
+            }
+
+            .total-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .address-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .address-label {
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- DATUM navigation -->
+    <div class="menu-container">
+        <a href="/">Status</a>
+        <a href="/config">Config</a>
+        <a href="/clients">Clients</a>
+        <a href="/threads">Threads</a>
+        <a href="/coinbaser">Coinbaser</a>
+        <a href="/blockfound" style="background-color: darkslategrey;">
+            Block Found
+        </a>
+    </div>
+
+    <main class="blockfound-page">
+
+        <h1 class="blockfound-title">BLOCK FOUND</h1>
+
+        <div class="blockfound-subtitle">
+            Have I found a block?
+        </div>
+
+        <!-- Search controls -->
+        <section class="blockfound-box search-panel">
+
+            <h2>BLOCK SEARCH</h2>
+
+            <div class="form-row">
+                <label for="search-range">
+                    Search the last:
+                </label>
+
+                <select id="search-range" class="blockfound-select">
+                    <option value="1">1 block</option>
+                    <option value="5">5 blocks</option>
+                    <option value="10">10 blocks</option>
+                    <option value="25">25 blocks</option>
+                    <option value="50">50 blocks</option>
+                    <option value="100" selected>100 blocks</option>
+                    <option value="500">500 blocks</option>
+                    <option value="1000">1,000 blocks</option>
+                    <option value="time-1h">1 hour</option>
+                    <option value="time-6h">6 hours</option>
+                    <option value="time-12h">12 hours</option>
+                    <option value="time-24h">24 hours</option>
+                    <option value="time-3d">3 days</option>
+                    <option value="time-1w">1 week</option>
+                    <option value="time-2w">2 weeks</option>
+                    <option value="time-1m">1 month</option>
+                    <option value="time-2m">2 months</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+
+                <label>
+                    Addresses to search:
+                </label>
+
+                <div class="address-row">
+                    <input type="checkbox" id="datum-address" checked>
+
+                    <span class="address-label">
+                        DATUM Coinbaser
+                    </span>
+
+                    <span class="datum-address" id="datum-address-display">
+                        Loading from DATUM configuration...
+                    </span>
+                </div>
+
+                <div class="address-row">
+                    <input type="checkbox" id="custom-1">
+
+                    <span class="address-label">
+                        Custom Address 1
+                    </span>
+
+                    <input class="address-input"
+                           id="custom-address-1"
+                           type="text"
+                           placeholder="Enter Bitcoin address">
+                </div>
+
+                <div class="address-row">
+                    <input type="checkbox" id="custom-2">
+
+                    <span class="address-label">
+                        Custom Address 2
+                    </span>
+
+                    <input class="address-input"
+                           id="custom-address-2"
+                           type="text"
+                           placeholder="Enter Bitcoin address">
+                </div>
+
+                <div class="address-row">
+                    <input type="checkbox" id="custom-3">
+
+                    <span class="address-label">
+                        Custom Address 3
+                    </span>
+
+                    <input class="address-input"
+                           id="custom-address-3"
+                           type="text"
+                           placeholder="Enter Bitcoin address">
+                </div>
+
+                <div class="address-row">
+                    <input type="checkbox" id="custom-4">
+
+                    <span class="address-label">
+                        Custom Address 4
+                    </span>
+
+                    <input class="address-input"
+                           id="custom-address-4"
+                           type="text"
+                           placeholder="Enter Bitcoin address">
+                </div>
+
+                <div class="address-row">
+                    <input type="checkbox" id="custom-5">
+
+                    <span class="address-label">
+                        Custom Address 5
+                    </span>
+
+                    <input class="address-input"
+                           id="custom-address-5"
+                           type="text"
+                           placeholder="Enter Bitcoin address">
+                </div>
+
+            </div>
+
+            <button class="search-button" id="search-button">
+                SEARCH BLOCKCHAIN
+            </button>
+
+            <div class="search-status" id="search-status">
+                Search has not been run.
+            </div>
+
+            <div class="settings-note">
+                No automatic polling or background blockchain checking is used.
+            </div>
+
+        </section>
+
+
+        <!-- Totals -->
+        <section class="blockfound-box">
+
+            <h2>SEARCH TOTALS</h2>
+
+            <div class="total-grid">
+
+                <div class="total-card">
+                    <div class="label">Block Rewards</div>
+                    <div class="btc-value" id="reward-total">
+                        0.00000000 BTC
+                    </div>
+                </div>
+
+                <div class="total-card">
+                    <div class="label">Fees</div>
+                    <div class="btc-value" id="fees-total">
+                        0.00000000 BTC
+                    </div>
+                </div>
+
+                <div class="total-card">
+                    <div class="label">Combined</div>
+                    <div class="btc-value" id="combined-total">
+                        0.00000000 BTC
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Block count -->
+        <section class="blockfound-box">
+
+            <h2>BLOCKS FOUND</h2>
+
+            <div class="blocks-count" id="blocks-found-count">
+                0
+            </div>
+
+            <div class="no-block" id="block-count-description">
+                Run a search to check your selected addresses.
+            </div>
+
+        </section>
+
+
+        <div class="blockfound-grid">
+
+            <!-- Newest block -->
+            <section class="blockfound-box newest-block">
+
+                <h2>NEWEST BLOCK FOUND</h2>
+
+                <div id="newest-block-display">
+
+                    <div class="no-block">
+                        No matching block has been found yet.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- History -->
+            <section class="blockfound-box history-box">
+
+                <h2>BLOCK HISTORY</h2>
+
+                <div class="matrix-history" id="matrix-history">
+
+                    <div class="matrix-decoration">
+                        01001001011010100101011001010101<br>
+                        10101001101001010110100101011010<br>
+                        00101010110100101001010110101001<br>
+                    </div>
+
+                    <div class="no-block">
+                        Search results will appear here.
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- Future settings area -->
+        <section class="blockfound-box">
+
+            <h2>BLOCK FOUND SETTINGS</h2>
+
+            <div class="settings-note">
+                Display duration, history size, fireworks duration,
+                and other user preferences will be connected here
+                in a later step.
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- STEP 1 ONLY: visual placeholder -->
+    <script>
+        document.getElementById("search-button").addEventListener("click", function () {
+
+            const status = document.getElementById("search-status");
+
+            status.textContent =
+                "SEARCH REQUEST READY — Bitcoin Core connection will be added in Step 2.";
+
+        });
+    </script>
+
+</body>
+</html>

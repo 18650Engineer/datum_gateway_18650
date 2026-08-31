@@ -44,6 +44,7 @@ install(TARGETS datum_gateway DESTINATION bin)
 set(WEB_RESOURCES
 	www/auth_failed.html
 	www/home.html
+	www/blockfound.html
 	www/clients_top.html
 	www/coinbaser_top.html
 	www/config.html
